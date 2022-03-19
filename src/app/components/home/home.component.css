@@ -1,0 +1,81 @@
+.parent {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+.content {
+  overflow-y: auto;
+}
+.div1 {
+  background-color: white;
+}
+.div2 {
+  background-color: white;
+  display: flex;
+  justify-content: start;
+}
+.div2 > div {
+  display: flex;
+  gap: 10px;
+}
+.div3 {
+  background-color: white;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+.div3 > div {
+  display: flex;
+  gap: 50px;
+}
+.div4 {
+  background-color: blueviolet;
+}
+table {
+  width: 100%;
+}
+/* Structure */
+.example-container {
+  position: relative;
+}
+
+.example-table-container {
+  position: relative;
+  min-height: 200px;
+  max-height: 400px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.example-loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.example-rate-limit-reached {
+  max-width: 360px;
+  text-align: center;
+}
+
+/* Column Widths */
+.mat-column-number,
+.mat-column-state {
+  max-width: 64px;
+}
+
+.mat-column-created {
+  max-width: 124px;
+}
