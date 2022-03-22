@@ -11,6 +11,10 @@
 .div1 {
   background-color: white;
 }
+.div1 > h1 {
+  color: #15467d;
+  font-weight: bold;
+}
 .div2 {
   background-color: white;
   display: flex;
@@ -18,24 +22,28 @@
 }
 .div2 > div {
   display: flex;
-  gap: 10px;
+  gap: 40px;
 }
 .div3 {
   background-color: white;
   display: flex;
   justify-content: start;
   align-items: center;
+  gap: 50px;
 }
+
 .div3 > div {
   display: flex;
   gap: 50px;
 }
+.div3 > div > p {
+  color: #15467d;
+  font-weight: bold;
+}
 .div4 {
   background-color: blueviolet;
 }
-table {
-  width: 100%;
-}
+
 /* Structure */
 .example-container {
   position: relative;
