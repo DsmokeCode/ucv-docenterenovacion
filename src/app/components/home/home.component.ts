@@ -1,83 +1,219 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-
+import { HttpClient } from '@angular/common/http';
+import { Subject } from 'rxjs';
+import { SelectService } from 'src/app/services/select.service';
+import { FormControl } from '@angular/forms';
 interface Food {
-  value: string;
-  viewValue: string;
+	value: string;
+	viewValue: string;
 }
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
+	selector: 'app-home',
+	templateUrl: './home.component.html',
+	styleUrls: ['./home.component.css'],
 })
-export class HomeComponent {
-  columnas: string[] = ['codigo', 'descripcion', 'precio'];
+export class HomeComponent implements OnInit {
+	// dtOptions: DataTables.Settings = {};
+	dtTrigger = new Subject();
 
-  datos: Articulo[] = [
-    { codigo: 1, descripcion: 'Hydrogen', precio: 1.0079 },
-    { codigo: 2, descripcion: 'Helium', precio: 4.0026 },
-    { codigo: 3, descripcion: 'Lithium', precio: 6.941 },
-    { codigo: 4, descripcion: 'Beryllium', precio: 9.0122 },
-    { codigo: 5, descripcion: 'Boron', precio: 10.811 },
-    { codigo: 6, descripcion: 'Carbon', precio: 12.0107 },
-    { codigo: 7, descripcion: 'Nitrogen', precio: 14.0067 },
-    { codigo: 8, descripcion: 'Oxygen', precio: 15.9994 },
-    { codigo: 9, descripcion: 'Fluorine', precio: 18.9984 },
-    { codigo: 10, descripcion: 'Neon', precio: 20.1797 },
-    { codigo: 11, descripcion: 'Sodium', precio: 22.9897 },
-    { codigo: 12, descripcion: 'Magnesium', precio: 24.305 },
-    { codigo: 13, descripcion: 'Aluminum', precio: 26.9815 },
-    { codigo: 14, descripcion: 'Silicon', precio: 28.0855 },
-    { codigo: 15, descripcion: 'Phosphorus', precio: 30.9738 },
-    { codigo: 16, descripcion: 'Sulfur', precio: 32.065 },
-    { codigo: 17, descripcion: 'Chlorine', precio: 35.453 },
-    { codigo: 18, descripcion: 'Argon', precio: 39.948 },
-    { codigo: 19, descripcion: 'Potassium', precio: 39.0983 },
-    { codigo: 20, descripcion: 'Calcium', precio: 40.078 },
-  ];
-  dataSource: any;
-  foods: Food[] = [
-    { value: '0', viewValue: 'Pregrado presencial' },
-    { value: '1', viewValue: 'Pregrado semipresencial' },
-    { value: '2', viewValue: 'Pregrado distancia' },
-  ];
-  campus: Food[] = [
-    { value: '0', viewValue: 'UCV - Campus Lima Norte' },
-    { value: '1', viewValue: 'UCV - Campus Callao' },
-    { value: '2', viewValue: 'UCV - Campus Trujillo ' },
-  ];
-  anos: Food[] = [
-    { value: '0', viewValue: '202200' },
-    { value: '1', viewValue: '202201' },
-    { value: '2', viewValue: '202202 ' },
-  ];
-  escuelas: Food[] = [
-    { value: '0', viewValue: 'Administración' },
-    { value: '1', viewValue: 'Contabilidad ' },
-    { value: '2', viewValue: 'Ingeniería de Sistemas ' },
-  ];
-  nombres: Food[] = [{ value: '0', viewValue: 'Cargando...' }];
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+	SelectPrograma!: string;
+	SelectFilial!: string;
+	SelectEscuela!: string;
+	SelectPeriodo!: string;
 
-  ngOnInit() {
-    this.dataSource = new MatTableDataSource<Articulo>(this.datos);
-    this.dataSource.paginator = this.paginator;
-  }
+	// Select 1
+	public programas: any;
+	disableSelectPrograma = false;
+
+	// Select 2
+	public filials: any;
+	disableSelectFilial = true;
+
+	// Select 3
+	public escuelas: any;
+	disableSelectEscuela = true;
+	// Select 4
+	public periodos: any;
+	disableSelectPeriodo = true;
+
+	// Tabla Docente
+	public docentes: any;
+
+	columnas: string[] = ['idRenovacionDoc', 'ordenMerito', 'cPerCodigoDoc'];
+
+	dataSource: any;
+
+	nombres: Food[] = [{ value: '0', viewValue: 'Cargando...' }];
+
+	constructor(
+		private http: HttpClient,
+		private _selectService: SelectService
+	) {}
+	ngOnInit(): void {
+		this.getPrograma();
+		this.getFilial();
+
+		if (this.SelectPrograma == null) {
+			alert('Debe de Seleccionar un Programa');
+		}
+	}
+	@ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+
+	sPrograma(a: string) {
+		this.getEscuela(a);
+		this.disableSelectFilial = false;
+	}
+	sFilial(a: string) {
+		this.disableSelectEscuela = false;
+	}
+	sEscuela(a: string, b: string) {
+		this.getPeriodo(a, b);
+		this.disableSelectPeriodo = false;
+	}
+	sPeriodo(a: string, b: string, c: string) {
+		this.getDocente(a, b, c);
+	}
+
+	getPrograma() {
+		this._selectService.getPrograma().subscribe(
+			(response) => {
+				if (response) {
+					this.programas = response.lstItem;
+					console.log(this.programas);
+				} else {
+				}
+			},
+			(error) => {}
+		);
+	}
+	getFilial() {
+		this._selectService.getFilial().subscribe(
+			(response) => {
+				if (response) {
+					this.filials = response.lstItem;
+					console.log(this.filials);
+				} else {
+				}
+			},
+			(error) => {}
+		);
+	}
+	getEscuela(a: string) {
+		this._selectService.getEscuela(a).subscribe(
+			(response) => {
+				if (response.lstItem[0].nIntCodigo) {
+					this.escuelas = response.lstItem;
+					console.log(this.escuelas[0].nIntCodigo);
+				} else {
+					this.escuelas = [];
+					console.log(this.escuelas);
+				}
+			},
+			(error) => {}
+		);
+	}
+	getPeriodo(a: string, b: string) {
+		this._selectService.getPeriodo(a, b).subscribe(
+			(response) => {
+				if (response) {
+					this.periodos = response.lstItem;
+					console.log(this.periodos);
+				} else {
+				}
+			},
+			(error) => {}
+		);
+	}
+	getDocente(a: string, b: string, c: string) {
+		this._selectService.getDocente(a, b, c).subscribe(
+			(response) => {
+				if (response) {
+					this.docentes = response.lstItem;
+					console.log(this.docentes);
+					this.dataSource = new MatTableDataSource<Docentes>(
+						this.docentes
+					);
+					this.dataSource.paginator = this.paginator;
+				} else {
+				}
+			},
+			(error) => {}
+		);
+	}
+}
+export class Docentes {
+	constructor(
+		public cPerCodigoDoc: any,
+		public categoriaDoc: any,
+		public dedicacion: any,
+		public docente: any,
+		public edd: any,
+		public idRenovacionDoc: any,
+		public medDisciplinarias: any,
+		public ordenMerito: any,
+		public produccionIntelectual: any,
+		public puntajeObtenido: any,
+		public renacyt: any,
+		public renovacion: any,
+		public resultado: any,
+		public reunionDelegados: any
+	) {}
 }
 export class PeriodicElement {
-  constructor(
-    public name: string,
-    public position: number,
-    public weight: number,
-    public symbol: string
-  ) {}
+	constructor(
+		public name: string,
+		public position: number,
+		public weight: number,
+		public symbol: string
+	) {}
 }
 export class Articulo {
-  constructor(
-    public codigo: number,
-    public descripcion: string,
-    public precio: number
-  ) {}
+	constructor(
+		public codigo: number,
+		public descripcion: string,
+		public precio: number
+	) {}
+}
+export class Cliente {
+	constructor(
+		public id_clientes: string,
+		public nombres: string,
+		public ape_paterno: string,
+		public ape_materno: string,
+		public sexo: string,
+		public n_documento: string,
+		public f_nacimiento: any,
+		public email: string,
+		public telefono_fijo: string,
+		public telefono_movil: string,
+		public direccion: string,
+		public distrito: string,
+		public id_tipo_documento: number,
+		public id_usuarios: number,
+		public updated_at: any,
+		public created_at: any
+	) {}
+}
+export class Programas {
+	constructor(
+		public id_clientes: string,
+		public nombres: string,
+		public ape_paterno: string,
+		public ape_materno: string,
+		public sexo: string,
+		public n_documento: string,
+		public f_nacimiento: any,
+		public email: string,
+		public telefono_fijo: string,
+		public telefono_movil: string,
+		public direccion: string,
+		public distrito: string,
+		public id_tipo_documento: number,
+		public id_usuarios: number,
+		public updated_at: any,
+		public created_at: any
+	) {}
 }
